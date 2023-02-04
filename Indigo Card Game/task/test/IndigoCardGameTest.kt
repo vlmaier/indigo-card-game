@@ -6,48 +6,193 @@ import org.hyperskill.hstest.testing.TestedProgram
 class CardGameTest : StageTest<Any>() {
 
     @DynamicTest
-    fun printRanksSuitsCardsTest(): CheckResult {
+    fun normalExeTest(): CheckResult {
         val main = TestedProgram()
-        val outputString = main.start().trim()
-        val lines = outputString.split('\n').map { it.trim() }.filter { it != "" }
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.toLowerCase(), 0, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
 
-        var ranksPrinted = -1
-        var suitsPrinted = -1
-        var cardsPrinted = -1
-        for ((index, line) in lines.withIndex()) {
-            if (isRanks(line)) ranksPrinted = index
-            if (isSuits(line)) suitsPrinted = index
-            if (isCards(line)) cardsPrinted = index
-        }
+        outputString = main.execute("reset").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Card deck is reset.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the reset action.")
 
-        if (ranksPrinted == -1) return CheckResult(false, "Line with ranks isn't correct.")
-        if (suitsPrinted == -1) return CheckResult(false, "Line with suits isn't correct.")
-        if (cardsPrinted == -1) return CheckResult(false, "Line with all cards isn't correct.")
+        outputString = main.execute("shuffle").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Card deck is shuffled.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the shuffle action.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("52").trim()
+        position = checkOIfValidCards(outputString)
+        if ( position  == -1 ) return CheckResult(false, "Wrong cards printout.")
+        if (!checkIfUniqueCards(outputString)) return CheckResult(false, "There are duplicate cards.")
+        position = checkOutput(outputString.toLowerCase(), position, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("exit").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Bye".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
+
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
 
         return CheckResult.correct()
     }
 
+    @DynamicTest
+    fun InsufficientNumberTest(): CheckResult {
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.toLowerCase(), 0, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("reset").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Card deck is reset.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the reset action.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("10").trim()
+        position = checkOIfValidCards(outputString)
+        if ( position  == -1 ) return CheckResult(false, "Wrong cards printout.")
+        if (!checkIfUniqueCards(outputString)) return CheckResult(false, "There are duplicate cards.")
+        position = checkOutput(outputString.toLowerCase(), position, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("43").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "The remaining cards are insufficient to meet the request.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input number of cards larger than remaining cards.")
+
+        outputString = main.execute("reset").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Card deck is reset.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the reset action.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("52").trim()
+        position = checkOIfValidCards(outputString)
+        if ( position  == -1 ) return CheckResult(false, "Wrong cards printout.")
+        if (!checkIfUniqueCards(outputString)) return CheckResult(false, "There are duplicate cards.")
+        position = checkOutput(outputString.toLowerCase(), position, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("1").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "The remaining cards are insufficient to meet the request.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input number of cards larger than remaining cards.")
+
+        outputString = main.execute("exit").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Bye".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
+
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
+    fun InvalidNumberTest(): CheckResult {
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.toLowerCase(), 0, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("0").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Invalid number of cards.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input of invalid number of cards.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("one").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Invalid number of cards.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input of invalid number of cards.")
+
+        outputString = main.execute("get").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Number of cards:".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after the get action.")
+
+        outputString = main.execute("53").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Invalid number of cards.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input of invalid number of cards.")
+
+        outputString = main.execute("exit").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Bye".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
+
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
+    fun WrongActionTest(): CheckResult {
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.toLowerCase(), 0, "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong menu prompt.")
+
+        outputString = main.execute("action").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Wrong action.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input of invalid action.")
+
+        outputString = main.execute("game").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Wrong action.".toLowerCase(), "Choose an action (reset, shuffle, get, exit):".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output after input of invalid action.")
+
+        outputString = main.execute("exit").trim()
+        position = checkOutput(outputString.toLowerCase(), 0, "Bye".toLowerCase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
+
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
 }
 
-fun isRanks(string: String): Boolean {
-    val ranks = listOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
-    val outRanks = string.split(' ').map { it.trim() }.filter { it != "" }
-    return ( outRanks.containsAll(ranks) && ranks.size == outRanks.size )
+fun checkOutput(outputString: String, searchPos: Int, vararg checkStr: String): Int {
+    var searchPosition = searchPos
+    for (str in checkStr) {
+        val findPosition = outputString.indexOf(str, searchPosition)
+        if (findPosition == -1) return -1
+        if ( outputString.substring(searchPosition until findPosition).isNotBlank() ) return -1
+        searchPosition = findPosition + str.length
+    }
+    return searchPosition
 }
 
-fun isSuits(string: String): Boolean {
-    val ranks = listOf("♦", "♥", "♠", "♣")
-    val outRanks = string.split(' ').map { it.trim() }.filter { it != "" }
-    return ( outRanks.containsAll(ranks) && ranks.size == outRanks.size )
+fun checkOIfValidCards(outputString: String): Int {
+    val lines = outputString.lines()
+    val cards = lines.first().trim().split(" ")
+    val cardRegex = "(A|[2-9]|10|J|Q|K)(♦|♥|♠|♣)".toRegex()
+    for (card in cards) if (!card.matches(cardRegex)) {
+        return -1
+    }
+
+    return lines.first().length
 }
 
-fun isCards(string: String): Boolean {
-    val ranks = listOf("A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
-        "A♥", "2♥", "3♥", "4♥", "5♥", "6♥", "7♥", "8♥", "9♥", "10♥", "J♥", "Q♥", "K♥",
-        "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦",
-        "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣")
-    val outRanks = string.split(' ').map { it.trim() }.filter { it != "" }
-    return ( outRanks.containsAll(ranks) && ranks.size == outRanks.size )
+fun checkIfUniqueCards(outputString: String): Boolean {
+    val lines = outputString.lines()
+    val cards = lines.first().trim().split(" ")
+    return cards.distinct().size == cards.size
 }
 
 
