@@ -1,0 +1,17 @@
+type: code
+custom_name: I'm learning Kotlin!
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun main() {
+        // write here
+
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20626#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Tue, 07 Feb 2023 20:13:53 UTC"
+record: -1
