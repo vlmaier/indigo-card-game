@@ -1,0 +1,12 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/4706#comment
+status: Solved
+feedback:
+  message: "<html>Passed. Congratulations! It is your first Kotlin program that really\
+    \ works. In future topics, you will learn more about this code.</html>"
+  time: "Sat, 11 Feb 2023 20:24:46 UTC"
+record: -1
