@@ -1,0 +1,15 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun main() {
+        TODO("Remove this line and write your solution here")
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/4433#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 13 Feb 2023 08:33:17 UTC"
+record: -1
