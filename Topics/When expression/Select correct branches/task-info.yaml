@@ -1,0 +1,23 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: "11, 12 -&gt; print(\"Ok\")"
+- text: '&gt; 0 -&gt; print("Ok")'
+- text: in 1..22 -&gt; print("Ok")
+- text: in 1..20 -&gt; print("Ok"); print("Ok")
+- text: '"2" -&gt; print("Ok")'
+- text: a + a -&gt; print("Ok")
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/5968#comment
+status: Solved
+record: -1
+local_check: false

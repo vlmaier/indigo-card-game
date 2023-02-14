@@ -1,0 +1,23 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: Any <code>if</code> expression can be expressed with <code>when</code>.
+- text: "If we use <code>when</code> without an argument, the branch conditions will\
+    \ be boolean expressions."
+- text: We can not execute more than one branch in <code>when</code>.
+- text: An <code>else</code> branch should be used with <code>when</code> only.
+- text: We can not use multiple statements with <code>when</code>.
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/5965#comment
+status: Solved
+record: -1
+local_check: false
