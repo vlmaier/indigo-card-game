@@ -1,0 +1,18 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    // write your code here
+
+    /* Do not change code below */
+    fun main() {
+        val a = readLine()!!.toInt()
+        val b = readLine()!!.toInt()
+        val c = readLine()!!.toInt()
+        println(isRightEquation(a, b, c))
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/4591#comment
+status: Solved
+record: -1
