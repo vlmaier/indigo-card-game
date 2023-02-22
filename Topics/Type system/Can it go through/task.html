@@ -1,0 +1,9 @@
+<h2>Can it go through?</h2>
+<p></p>
+<p>Analyze the body of the function carefully and specify what type of return value the compiler will output?</p>
+<pre><code class="language-kotlin">fun checkIfNotNull() {
+    val isNull: Boolean? = null
+    if (isNull == null) {
+        throw Exception("Value is null!")
+    }
+}</code></pre>

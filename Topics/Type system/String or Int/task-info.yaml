@@ -1,0 +1,12 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: "fun isNumber(input: String) // write this function"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/9697#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Wed, 22 Feb 2023 08:11:00 UTC"
+record: -1
