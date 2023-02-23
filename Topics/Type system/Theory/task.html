@@ -72,11 +72,18 @@ val result: Unit = logCurrentState()</code></pre>
 }</code></pre>
 <p>Therefore, a throw is an expression of type <em>Nothing</em>.</p>
 <p>With the <em>Nothing</em> type, which can be a subtype of <em>Any</em> type, the type system allows any expression to fail while doing some work:</p>
-<pre><code class="language-kotlin">fun throwIfNull(name: String?) {
-    if (name == null){
-      throw Exception("Name can't be null!")
-    }
-}</code></pre>
+<pre><code class="language-kotlin">data class Person(val name: String?)
+
+fun throwIfNull() {
+    throw Exception("Name can't be null!")
+}
+
+fun main() {
+    val person = Person(null)
+    val personName = person.name ?: throwIfNull()
+    println(personName)
+}
+</code></pre>
 <p>Like any other type, <em>Nothing</em> can be nullable with the help of a question mark suffix. <em>Nothing?</em> can only contain one value, <em>null</em>:</p>
 <p style="text-align: center;"><img alt="" height="267" name="Screenshot_29.png" src="https://ucarecdn.com/eb986aa2-7a2d-4b9c-84aa-d00665e7d3fa/" width="106"/></p>
 <h5 id="conclusion">Conclusion</h5>

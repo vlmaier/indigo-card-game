@@ -1,0 +1,13 @@
+<h2>Password decomposition</h2>
+<p></p><p>You have the following code:</p><pre><code class="language-kotlin">fun main() {
+    var validationResult = false
+    var password: String
+    while (!validationResult) {
+        var password = readln()
+        validationResult = password.length &gt; 4
+        if (!validationResult) {
+            println("Your password should be five or longer characters, please write a new password")
+        }
+    }
+    println("Good password")
+}</code></pre><p>This program asks for a password, and if it is shorter than 5 characters, it asks again until it receives a password of 5 or longer.</p><p>We need to decompose the program to the functions <code class="language-kotlin">validatePassword()</code> and <code class="language-kotlin">main()</code>.  You already have the <code class="language-kotlin">main()</code> function.</p><p>Your task is to write a password length check in the <code class="language-kotlin">validatePassword()</code> function. If the password is less than 5 characters, print "<em>Your password should be five or longer characters, please write a new password</em>" and return <code class="language-kotlin">false</code> as the result of the function.</p><p> If the password is 5 characters or longer, print "<em>Good password</em>" and return <code class="language-kotlin">true</code>.</p><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
