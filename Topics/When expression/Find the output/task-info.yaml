@@ -1,12 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: No output.
-- text: a
-- text: b
-- text: ab
-- text: Compilation error.
-- text: Runtime error.
 files:
 - name: src/Main.kt
   visible: true

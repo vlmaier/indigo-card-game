@@ -1,10 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: Enum allows to store only uppercase underscore-separated names
-- text: Enum cannot store an instance with NULL value
-- text: Enum can store an instance with multiple parameters
-- text: Enum can be extended by adding a custom method
+is_multiple_choice: false
 files:
 - name: src/Main.kt
   visible: true

@@ -1,10 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: Throwable is a subtype of Error
-- text: Throwable has two equal subtypes
-- text: Throwable is a supertype of RuntimeException
-- text: Throwable is a supertype of Exception
+is_multiple_choice: false
 files:
 - name: src/Main.kt
   visible: true

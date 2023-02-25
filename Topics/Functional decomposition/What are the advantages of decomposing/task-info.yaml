@@ -1,11 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: Code fragments are easier to reuse
-- text: Decomposed programs use less memory
-- text: Code is more readable
-- text: Decomposed program works faster
-- text: Separate parts of code are easier to test
+is_multiple_choice: false
 files:
 - name: src/Main.kt
   visible: true

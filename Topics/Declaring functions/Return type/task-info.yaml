@@ -1,11 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: "Null"
-- text: Void
-- text: Nothing
-- text: Unit
-- text: Int
 files:
 - name: src/Main.kt
   visible: true
