@@ -1,0 +1,13 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: // write the IceCreamOrder class here
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/10750#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sat, 25 Feb 2023 15:49:04 UTC"
+record: -1
+submission_language: kotlin

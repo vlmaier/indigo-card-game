@@ -1,0 +1,13 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: // write the EspressoMachine class here
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/10751#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sat, 25 Feb 2023 16:01:39 UTC"
+record: -1
+submission_language: kotlin

@@ -1,5 +1,10 @@
 type: choice
 is_multiple_choice: false
+options:
+- text: <b>Output:</b><br>1234
+- text: <b>Output:</b><br>123<br> <br>4
+- text: <b>Output:</b><br>12<br>3<br>4
+- text: <b>Output:</b><br>123<br>4
 files:
 - name: src/Main.kt
   visible: true

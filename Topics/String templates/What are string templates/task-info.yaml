@@ -1,5 +1,9 @@
 type: choice
 is_multiple_choice: false
+options:
+- text: String templates are syntactic sugar in Kotlin
+- text: String templates are string literals that contain embedded expressions
+- text: String templates are expressions that have embedded expressions
 files:
 - name: src/Main.kt
   visible: true

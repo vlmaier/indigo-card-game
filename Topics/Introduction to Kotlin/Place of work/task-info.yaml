@@ -1,5 +1,10 @@
 type: choice
-is_multiple_choice: false
+is_multiple_choice: true
+options:
+- text: Android device
+- text: Desktop
+- text: Browser
+- text: Java Virtual Machine
 files:
 - name: src/Main.kt
   visible: true

@@ -1,5 +1,11 @@
 type: choice
 is_multiple_choice: false
+options:
+- text: '"HYPER"'
+- text: '"H"'
+- text: '"Y"'
+- text: '"SKILL"'
+- text: '"-"'
 files:
 - name: src/Main.kt
   visible: true

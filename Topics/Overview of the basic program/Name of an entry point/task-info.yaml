@@ -1,5 +1,14 @@
 type: choice
 is_multiple_choice: false
+options:
+- text: App
+- text: app
+- text: Run
+- text: run
+- text: Main
+- text: main
+- text: Program
+- text: program
 files:
 - name: src/Main.kt
   visible: true
