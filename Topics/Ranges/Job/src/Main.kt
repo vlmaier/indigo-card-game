@@ -1,0 +1,1 @@
+fun main() = print(readln().toInt() in 18..59)
