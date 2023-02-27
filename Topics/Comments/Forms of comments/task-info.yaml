@@ -1,0 +1,23 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: / My name is end-of line comment!
+- text: "// No, I am an end-of line comment!"
+- text: /* I am a comment too */
+- text: "* And me, me! I am a comment *"
+- text: "/** And I am a doc comment, nice to meet you */ "
+- text: "/*/* Don't trust them, I am a doc comment! *//"
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/4410#comment
+status: Solved
+record: -1
+local_check: false
