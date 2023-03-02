@@ -1,0 +1,22 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: The keyword continue only works together with labels.
+- text: "With a label, it provides a possibility to exit from the inner loop."
+- text: It cannot be used with break and return expressions in the same loop.
+- text: The keyword continue only works together with the if expression.
+- text: It lets us skip the current iteration of the loop using a condition.
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/6168#comment
+status: Solved
+record: -1
+local_check: false
