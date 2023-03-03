@@ -1,0 +1,13 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun tip(bill: Int, percentage: Int): Int {
+        // TODO
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/7858#comment
+status: Solved
+record: -1
+submission_language: kotlin
