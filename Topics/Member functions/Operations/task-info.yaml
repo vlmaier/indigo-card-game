@@ -1,0 +1,23 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: val counter = Counter()
+- text: val counter = Counter(1)
+- text: Counter().increment()
+- text: Counter().increment(1)
+- text: Counter(1).increment()
+- text: Counter(1).increment(1)
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/6366#comment
+status: Solved
+record: -1
+local_check: false

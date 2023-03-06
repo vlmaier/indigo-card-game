@@ -1,0 +1,17 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    class Patient(val name: String) {
+
+        // write the say method here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/6368#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 06 Mar 2023 18:35:40 UTC"
+record: -1
+submission_language: kotlin
