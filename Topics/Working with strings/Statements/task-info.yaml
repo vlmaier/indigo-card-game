@@ -1,0 +1,21 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: Indexation of elements starts with 1.
+- text: They are represented by the <b>Text</b> type.
+- text: Two strings can be concatenated with the help of the <b>+</b> operator.
+- text: ' Strings are immutable.'
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/12564#comment
+status: Solved
+record: -1
+local_check: false
