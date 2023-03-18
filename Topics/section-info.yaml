@@ -31,3 +31,4 @@ content:
 - Working with strings
 - Mutable List
 - Inheritance
+- toString()
