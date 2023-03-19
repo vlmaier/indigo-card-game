@@ -700,6 +700,57 @@ files:
         return count
     }
   learner_created: false
+- name: src/indigo/Deck.kt
+  visible: true
+  learner_created: true
+- name: src/indigo/Extensions.kt
+  visible: true
+  learner_created: true
+- name: src/indigo/Player.kt
+  visible: true
+  learner_created: true
+- name: src/indigo/Table.kt
+  visible: true
+  learner_created: true
+- name: src/indigo/Indigo.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16511#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #1
+
+    Wrong computer wins cards message.
+
+    Please find below the output of your program during this failed test.
+    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.
+
+    ---
+
+    Indigo Card Game
+    Play first?
+    &gt; yes
+    Initial cards on the table: K♥ 6♥ 7♦ J♥
+    4 cards on the table, and the top card is J♥
+
+    Cards in hand: 1)5♣ 2)9♦ 3)7♥ 4)J♦ 5)A♠ 6)Q♦
+    Choose a card to play (1-6):
+    &gt; 1
+    5 cards on the table, and the top card is 5♣
+
+    Computer plays 10♥
+    6 cards on the table, and the top card is 10♥
+
+    Cards in hand: 1)9♦ 2)7♥ 3)J♦ 4)A♠ 5)Q♦
+    Choose a card to play (1-5):
+    &gt; 1
+    7 cards on the table, and the top card is 9♦
+
+    Computer plays 9♠
+    8 cards on the table, and the top card is 9♠
+
+    Cards in hand: 1)7♥ 2)J♦ 3)A♠ 4)Q♦
+    Choose a card to play (1-4):
+  time: "Sun, 19 Mar 2023 08:10:49 UTC"
 record: -1

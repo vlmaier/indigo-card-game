@@ -9,6 +9,500 @@ class ErrorData(val correct: Boolean, val errorMsg: String,
 class CardGameTest : StageTest<Any>() {
 
     @DynamicTest
+    fun playFirstNormalExeTest3(): CheckResult {
+        val deck = mutableListOf<String>()
+        val cardsInHand = mutableListOf<String>()
+        var pointsPlayer = 0
+        var pointsComputer = 0
+        var pointsOnTable = 0
+        var numOfCardsPlayer = 0
+        var numOfCardsComputer = 0
+        var numOfCardsOnTable = 0
+        var whoWon = 0
+
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
+        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
+
+        outputString = main.execute("yes").trim()
+        var validOutput = checkInitial(outputString)
+        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+        deck.addAll(validOutput.cardsList)
+        var topCard = validOutput.topCard
+
+        outputString = outputString.substringAfter(topCard).trim()
+        numOfCardsOnTable = 4
+        pointsOnTable = countPoints(validOutput.cardsList)
+        repeat(4) {
+            for (numOfCards in 6 downTo 1) {
+                validOutput = checkPlayerOutput2(outputString, numOfCards, numOfCardsOnTable, topCard)
+                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                if (numOfCards == 6) {
+                    cardsInHand.clear()
+                    cardsInHand.addAll(validOutput.cardsList)
+                    for (card in cardsInHand)
+                        if ( deck.contains(card) )
+                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
+                    deck.addAll(cardsInHand)
+                } else {
+                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
+                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
+                }
+                var hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.cardsList.first())
+                    a.first == b.first || a.second == b.second
+                }
+                topCard = validOutput.cardsList.first()
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                cardsInHand.remove(topCard)
+                outputString = main.execute("1").trim()
+                if (hasWon) {
+                    whoWon = 0
+                    pointsPlayer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsPlayer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Player wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong player wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+
+                validOutput = checkComputerOutput2(outputString, numOfCardsOnTable, topCard)
+                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.topCard)
+                    (a.first == b.first) || (a.second == b.second)
+                }
+                topCard = validOutput.topCard
+                if ( deck.contains(topCard) )
+                    return CheckResult(false, "Computer played card is a duplicate.")
+                deck.add(topCard)
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                outputString = outputString.substringAfter(topCard).trim()
+                if (hasWon) {
+                    whoWon = 1
+                    pointsComputer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsComputer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Computer wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong computer wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+            }
+        }
+
+        position = if (numOfCardsOnTable == 0) checkOutput(outputString.lowercase(), 0, "No cards on the table".lowercase())
+        else checkOutput(outputString.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output for number of cards or the top card.")
+        if (whoWon == 0) {
+            pointsPlayer += pointsOnTable
+            numOfCardsPlayer += numOfCardsOnTable
+        } else {
+            pointsComputer += pointsOnTable
+            numOfCardsComputer += numOfCardsOnTable
+        }
+        if (numOfCardsPlayer >= numOfCardsComputer) pointsPlayer += 3
+        else pointsComputer += 3
+        position = checkOutput(outputString.lowercase(), position,
+            "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+            "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase(),
+            "Game Over".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
+    fun playFirstNormalExeTest4(): CheckResult {
+        val deck = mutableListOf<String>()
+        val cardsInHand = mutableListOf<String>()
+        var pointsPlayer = 0
+        var pointsComputer = 0
+        var pointsOnTable = 0
+        var numOfCardsPlayer = 0
+        var numOfCardsComputer = 0
+        var numOfCardsOnTable = 0
+        var whoWon = 0
+
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
+        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
+
+        outputString = main.execute("yes").trim()
+        var validOutput = checkInitial(outputString)
+        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+        deck.addAll(validOutput.cardsList)
+        var topCard = validOutput.topCard
+
+        outputString = outputString.substringAfter(topCard).trim()
+        numOfCardsOnTable = 4
+        pointsOnTable = countPoints(validOutput.cardsList)
+        repeat(4) {
+            for (numOfCards in 6 downTo 1) {
+                validOutput = checkPlayerOutput2(outputString, numOfCards, numOfCardsOnTable, topCard)
+                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                if (numOfCards == 6) {
+                    cardsInHand.clear()
+                    cardsInHand.addAll(validOutput.cardsList)
+                    for (card in cardsInHand)
+                        if ( deck.contains(card) )
+                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
+                    deck.addAll(cardsInHand)
+                } else {
+                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
+                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
+                }
+                var hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.cardsList.last())
+                    a.first == b.first || a.second == b.second
+                }
+                topCard = validOutput.cardsList.last()
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                cardsInHand.remove(topCard)
+                outputString = main.execute("$numOfCards").trim()
+                if (hasWon) {
+                    whoWon = 0
+                    pointsPlayer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsPlayer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Player wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong player wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+
+                validOutput = checkComputerOutput2(outputString, numOfCardsOnTable, topCard)
+                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.topCard)
+                    (a.first == b.first) || (a.second == b.second)
+                }
+                topCard = validOutput.topCard
+                if ( deck.contains(topCard) )
+                    return CheckResult(false, "Computer played card is a duplicate.")
+                deck.add(topCard)
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                outputString = outputString.substringAfter(topCard).trim()
+                if (hasWon) {
+                    whoWon = 1
+                    pointsComputer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsComputer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Computer wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong computer wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+            }
+        }
+
+        position = if (numOfCardsOnTable == 0) checkOutput(outputString.lowercase(), 0, "No cards on the table".lowercase())
+        else checkOutput(outputString.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output for number of cards or the top card.")
+        if (whoWon == 0) {
+            pointsPlayer += pointsOnTable
+            numOfCardsPlayer += numOfCardsOnTable
+        } else {
+            pointsComputer += pointsOnTable
+            numOfCardsComputer += numOfCardsOnTable
+        }
+        if (numOfCardsPlayer >= numOfCardsComputer) pointsPlayer += 3
+        else pointsComputer += 3
+        position = checkOutput(outputString.lowercase(), position,
+            "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+            "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase(),
+            "Game Over".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
+    fun playSecondNormalExeTest3(): CheckResult {
+        val deck = mutableListOf<String>()
+        val cardsInHand = mutableListOf<String>()
+        var pointsPlayer = 0
+        var pointsComputer = 0
+        var pointsOnTable = 0
+        var numOfCardsPlayer = 0
+        var numOfCardsComputer = 0
+        var numOfCardsOnTable = 0
+        var whoWon = 0
+
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
+        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
+
+        outputString = main.execute("no").trim()
+        var validOutput = checkInitial(outputString)
+        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+        deck.addAll(validOutput.cardsList)
+        var topCard = validOutput.topCard
+
+        outputString = outputString.substringAfter(topCard).trim()
+        numOfCardsOnTable = 4
+        pointsOnTable = countPoints(validOutput.cardsList)
+        repeat(4) {
+            for (numOfCards in 6 downTo 1) {
+                validOutput = checkComputerOutput2(outputString, numOfCardsOnTable, topCard)
+                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                var hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.topCard)
+                    (a.first == b.first) || (a.second == b.second)
+                }
+                topCard = validOutput.topCard
+                if ( deck.contains(topCard) )
+                    return CheckResult(false, "Computer played card is a duplicate.")
+                deck.add(topCard)
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                outputString = outputString.substringAfter(topCard).trim()
+                if (hasWon) {
+                    whoWon = 1
+                    pointsComputer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsComputer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Computer wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong computer wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+
+                validOutput = checkPlayerOutput2(outputString, numOfCards, numOfCardsOnTable, topCard)
+                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                if (numOfCards == 6) {
+                    cardsInHand.clear()
+                    cardsInHand.addAll(validOutput.cardsList)
+                    for (card in cardsInHand)
+                        if ( deck.contains(card) )
+                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
+                    deck.addAll(cardsInHand)
+                } else {
+                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
+                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
+                }
+                hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.cardsList.first())
+                    a.first == b.first || a.second == b.second
+                }
+                topCard = validOutput.cardsList.first()
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                cardsInHand.remove(topCard)
+                outputString = main.execute("1").trim()
+                if (hasWon) {
+                    whoWon = 0
+                    pointsPlayer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsPlayer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Player wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong player wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+
+
+            }
+        }
+
+        position = if (numOfCardsOnTable == 0) checkOutput(outputString.lowercase(), 0, "No cards on the table".lowercase())
+        else checkOutput(outputString.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output for number of cards or the top card.")
+        if (whoWon == 0) {
+            pointsPlayer += pointsOnTable
+            numOfCardsPlayer += numOfCardsOnTable
+        } else {
+            pointsComputer += pointsOnTable
+            numOfCardsComputer += numOfCardsOnTable
+        }
+        if (numOfCardsPlayer > numOfCardsComputer) pointsPlayer += 3
+        else pointsComputer += 3
+        position = checkOutput(outputString.lowercase(), position,
+            "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+            "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase(),
+            "Game Over".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
+    fun playSecondNormalExeTest4(): CheckResult {
+        val deck = mutableListOf<String>()
+        val cardsInHand = mutableListOf<String>()
+        var pointsPlayer = 0
+        var pointsComputer = 0
+        var pointsOnTable = 0
+        var numOfCardsPlayer = 0
+        var numOfCardsComputer = 0
+        var numOfCardsOnTable = 0
+        var whoWon = 0
+
+        val main = TestedProgram()
+        var outputString = main.start().trim()
+        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
+        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
+
+        outputString = main.execute("no").trim()
+        var validOutput = checkInitial(outputString)
+        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+        deck.addAll(validOutput.cardsList)
+        var topCard = validOutput.topCard
+
+        outputString = outputString.substringAfter(topCard).trim()
+        numOfCardsOnTable = 4
+        pointsOnTable = countPoints(validOutput.cardsList)
+        repeat(4) {
+            for (numOfCards in 6 downTo 1) {
+                validOutput = checkComputerOutput2(outputString, numOfCardsOnTable, topCard)
+                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                var hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.topCard)
+                    (a.first == b.first) || (a.second == b.second)
+                }
+                topCard = validOutput.topCard
+                if ( deck.contains(topCard) )
+                    return CheckResult(false, "Computer played card is a duplicate.")
+                deck.add(topCard)
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                outputString = outputString.substringAfter(topCard).trim()
+                if (hasWon) {
+                    whoWon = 1
+                    pointsComputer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsComputer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Computer wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong computer wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+
+                validOutput = checkPlayerOutput2(outputString, numOfCards, numOfCardsOnTable, topCard)
+                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
+                if (numOfCards == 6) {
+                    cardsInHand.clear()
+                    cardsInHand.addAll(validOutput.cardsList)
+                    for (card in cardsInHand)
+                        if ( deck.contains(card) )
+                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
+                    deck.addAll(cardsInHand)
+                } else {
+                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
+                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
+                }
+                hasWon = if (numOfCardsOnTable == 0) false
+                else {
+                    val a = getRankSuit(topCard)
+                    val b = getRankSuit(validOutput.cardsList.last())
+                    a.first == b.first || a.second == b.second
+                }
+                topCard = validOutput.cardsList.last()
+                numOfCardsOnTable++
+                pointsOnTable += countPoints(listOf(topCard))
+                cardsInHand.remove(topCard)
+                outputString = main.execute("$numOfCards").trim()
+                if (hasWon) {
+                    whoWon = 0
+                    pointsPlayer += pointsOnTable
+                    pointsOnTable = 0
+                    numOfCardsPlayer += numOfCardsOnTable
+                    numOfCardsOnTable = 0
+                    position = checkOutput(outputString.lowercase(), 0, "Player wins cards".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong player wins cards message.")
+                    position = checkOutput(outputString.lowercase(), position,
+                        "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+                        "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase())
+                    if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+                    outputString = outputString.substringAfter("Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer").trim()
+                }
+            }
+        }
+
+        position = if (numOfCardsOnTable == 0) checkOutput(outputString.lowercase(), 0, "No cards on the table".lowercase())
+        else checkOutput(outputString.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong output for number of cards or the top card.")
+        if (whoWon == 0) {
+            pointsPlayer += pointsOnTable
+            numOfCardsPlayer += numOfCardsOnTable
+        } else {
+            pointsComputer += pointsOnTable
+            numOfCardsComputer += numOfCardsOnTable
+        }
+        if (numOfCardsPlayer > numOfCardsComputer) pointsPlayer += 3
+        else pointsComputer += 3
+        position = checkOutput(outputString.lowercase(), position,
+            "Score: Player $pointsPlayer - Computer $pointsComputer".lowercase(),
+            "Cards: Player $numOfCardsPlayer - Computer $numOfCardsComputer".lowercase(),
+            "Game Over".lowercase())
+        if ( position  == -1 ) return CheckResult(false, "Wrong score output.")
+        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
+
+        return CheckResult.correct()
+    }
+
+    @DynamicTest
     fun playFirstWrongInputTest(): CheckResult {
         val main = TestedProgram()
         var outputString = main.start().trim()
@@ -39,55 +533,7 @@ class CardGameTest : StageTest<Any>() {
         val topCard = validOutput.topCard
 
         outputString = outputString.substringAfter(topCard).trim()
-        validOutput = checkPlayerOutput(outputString, 6, 4, topCard)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-
-        outputString = main.execute("exit").trim()
-        position = checkOutput(outputString.lowercase(), 0, "Game Over".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
-
-        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
-
-        return CheckResult.correct()
-    }
-
-    @DynamicTest
-    fun playSecondWrongInputTest(): CheckResult {
-        val main = TestedProgram()
-        var outputString = main.start().trim()
-        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
-        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
-
-        outputString = main.execute("Hello").trim()
-        position = checkOutput(outputString.lowercase(), 0, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong output after wrong input after the play first question.")
-
-        outputString = main.execute("me").trim()
-        position = checkOutput(outputString.lowercase(), 0, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong output after wrong input after the play first question.")
-
-        outputString = main.execute("0").trim()
-        position = checkOutput(outputString.lowercase(), 0, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong output after wrong input after the play first question.")
-
-        outputString = main.execute("play").trim()
-        position = checkOutput(outputString.lowercase(), 0, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong output after wrong input after the play first question.")
-
-        outputString = main.execute("no").trim()
-        var validOutput = checkInitial(outputString)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        var topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        validOutput = checkComputerOutput(outputString,4, topCard)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        validOutput = checkPlayerOutput(outputString, 6, 5, topCard)
+        validOutput = checkPlayerOutput2(outputString, 6, 4, topCard)
         if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
 
         outputString = main.execute("exit").trim()
@@ -114,7 +560,7 @@ class CardGameTest : StageTest<Any>() {
         val topCard = validOutput.topCard
 
         outputString = outputString.substringAfter(topCard).trim()
-        validOutput = checkPlayerOutput(outputString, 6, 4, topCard)
+        validOutput = checkPlayerOutput2(outputString, 6, 4, topCard)
         if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
 
         outputString = main.execute("0").trim()
@@ -134,238 +580,6 @@ class CardGameTest : StageTest<Any>() {
         position = checkOutput(outputString.lowercase(), 0, "Game Over".lowercase())
         if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
 
-        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
-
-        return CheckResult.correct()
-    }
-
-    @DynamicTest
-    fun playFirstNormalExeTest1(): CheckResult {
-        val deck = mutableListOf<String>()
-        val cardsInHand = mutableListOf<String>()
-
-        val main = TestedProgram()
-        var outputString = main.start().trim()
-        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
-        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
-
-        outputString = main.execute("yes").trim()
-        var validOutput = checkInitial(outputString)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        deck.addAll(validOutput.cardsList)
-        var topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        var numOfCardsOnTable = 4
-        repeat(4) {
-            for (numOfCards in 6 downTo 1) {
-                validOutput = checkPlayerOutput(outputString, numOfCards, numOfCardsOnTable, topCard)
-                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                if (numOfCards == 6) {
-                    cardsInHand.clear()
-                    cardsInHand.addAll(validOutput.cardsList)
-                    for (card in cardsInHand)
-                        if ( deck.contains(card) )
-                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
-                    deck.addAll(cardsInHand)
-                } else {
-                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
-                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
-                }
-                topCard = validOutput.cardsList.first()
-                numOfCardsOnTable++
-                cardsInHand.remove(topCard)
-                outputString = main.execute("1").trim()
-
-                validOutput = checkComputerOutput(outputString, numOfCardsOnTable, topCard)
-                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                topCard = validOutput.topCard
-                if ( deck.contains(topCard) )
-                    return CheckResult(false, "Computer played card is a duplicate.")
-                deck.add(topCard)
-                numOfCardsOnTable++
-                outputString = outputString.substringAfter(topCard).trim()
-            }
-        }
-
-        position = checkOutput(outputString.lowercase(), 0, "52 cards on the table, and the top card is $topCard".lowercase(), "Game Over".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
-        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
-
-        return CheckResult.correct()
-    }
-
-    @DynamicTest
-    fun playFirstNormalExeTest2(): CheckResult {
-        val deck = mutableListOf<String>()
-        val cardsInHand = mutableListOf<String>()
-
-        val main = TestedProgram()
-        var outputString = main.start().trim()
-        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
-        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
-
-        outputString = main.execute("yes").trim()
-        var validOutput = checkInitial(outputString)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        deck.addAll(validOutput.cardsList)
-        var topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        var numOfCardsOnTable = 4
-        repeat(4) {
-            for (numOfCards in 6 downTo 1) {
-                validOutput = checkPlayerOutput(outputString, numOfCards, numOfCardsOnTable, topCard)
-                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                if (numOfCards == 6) {
-                    cardsInHand.clear()
-                    cardsInHand.addAll(validOutput.cardsList)
-                    for (card in cardsInHand)
-                        if ( deck.contains(card) )
-                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
-                    deck.addAll(cardsInHand)
-                } else {
-                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
-                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
-                }
-                topCard = validOutput.cardsList.last()
-                numOfCardsOnTable++
-                cardsInHand.remove(topCard)
-                outputString = main.execute("$numOfCards").trim()
-
-                validOutput = checkComputerOutput(outputString, numOfCardsOnTable, topCard)
-                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                topCard = validOutput.topCard
-                if ( deck.contains(topCard) )
-                    return CheckResult(false, "Computer played card is a duplicate.")
-                deck.add(topCard)
-                numOfCardsOnTable++
-                outputString = outputString.substringAfter(topCard).trim()
-            }
-        }
-
-        position = checkOutput(outputString.lowercase(), 0, "52 cards on the table, and the top card is $topCard".lowercase(), "Game Over".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
-        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
-
-        return CheckResult.correct()
-    }
-
-    @DynamicTest
-    fun playSecondNormalExeTest1(): CheckResult {
-        val deck = mutableListOf<String>()
-        val cardsInHand = mutableListOf<String>()
-
-        val main = TestedProgram()
-        var outputString = main.start().trim()
-        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
-        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
-
-        outputString = main.execute("no").trim()
-        var validOutput = checkInitial(outputString)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        deck.addAll(validOutput.cardsList)
-        var topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        var numOfCardsOnTable = 4
-        repeat(4) {
-            for (numOfCards in 6 downTo 1) {
-                validOutput = checkComputerOutput(outputString, numOfCardsOnTable, topCard)
-                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                topCard = validOutput.topCard
-                if ( deck.contains(topCard) )
-                    return CheckResult(false, "Computer played card is a duplicate.")
-                deck.add(topCard)
-                numOfCardsOnTable++
-                outputString = outputString.substringAfter(topCard).trim()
-
-                validOutput = checkPlayerOutput(outputString, numOfCards, numOfCardsOnTable, topCard)
-                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                if (numOfCards == 6) {
-                    cardsInHand.clear()
-                    cardsInHand.addAll(validOutput.cardsList)
-                    for (card in cardsInHand)
-                        if ( deck.contains(card) )
-                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
-                    deck.addAll(cardsInHand)
-                } else {
-                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
-                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
-                }
-                topCard = validOutput.cardsList.first()
-                numOfCardsOnTable++
-                cardsInHand.remove(topCard)
-                outputString = main.execute("1").trim()
-            }
-        }
-
-        position = checkOutput(outputString.lowercase(), 0, "52 cards on the table, and the top card is $topCard".lowercase(), "Game Over".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
-        if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
-
-        return CheckResult.correct()
-    }
-
-    @DynamicTest
-    fun playSecondNormalExeTest2(): CheckResult {
-        val deck = mutableListOf<String>()
-        val cardsInHand = mutableListOf<String>()
-
-        val main = TestedProgram()
-        var outputString = main.start().trim()
-        var position = checkOutput(outputString.lowercase(), 0, "Indigo Card Game".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong game title.")
-        position = checkOutput(outputString.lowercase(), position, "Play first?".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong play first prompt.")
-
-        outputString = main.execute("no").trim()
-        var validOutput = checkInitial(outputString)
-        if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-        deck.addAll(validOutput.cardsList)
-        var topCard = validOutput.topCard
-
-        outputString = outputString.substringAfter(topCard).trim()
-        var numOfCardsOnTable = 4
-        repeat(4) {
-            for (numOfCards in 6 downTo 1) {
-                validOutput = checkComputerOutput(outputString, numOfCardsOnTable, topCard)
-                if (!validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                topCard = validOutput.topCard
-                if ( deck.contains(topCard) )
-                    return CheckResult(false, "Computer played card is a duplicate.")
-                deck.add(topCard)
-                numOfCardsOnTable++
-                outputString = outputString.substringAfter(topCard).trim()
-
-                validOutput = checkPlayerOutput(outputString, numOfCards, numOfCardsOnTable, topCard)
-                if ( !validOutput.correct) return CheckResult(false, validOutput.errorMsg)
-                if (numOfCards == 6) {
-                    cardsInHand.clear()
-                    cardsInHand.addAll(validOutput.cardsList)
-                    for (card in cardsInHand)
-                        if ( deck.contains(card) )
-                            return CheckResult(false, "Some cards in hand have already passed on table (Duplicates).")
-                    deck.addAll(cardsInHand)
-                } else {
-                    if ( !cardsInHand.containsAll(validOutput.cardsList) )
-                        return CheckResult(false, "Cards in hand have changed since the last card was played.")
-                }
-                topCard = validOutput.cardsList.last()
-                numOfCardsOnTable++
-                cardsInHand.remove(topCard)
-                outputString = main.execute("$numOfCards").trim()
-            }
-        }
-
-        position = checkOutput(outputString.lowercase(), 0, "52 cards on the table, and the top card is $topCard".lowercase(), "Game Over".lowercase())
-        if ( position  == -1 ) return CheckResult(false, "Wrong exit message.")
         if (!main.isFinished) return CheckResult(false, "Application hasn't exited after exit command.")
 
         return CheckResult.correct()
@@ -420,9 +634,11 @@ fun checkInitial(output: String): ErrorData {
     return ErrorData(true, "", topCard, cardsOnTable)
 }
 
-fun checkPlayerOutput(output: String, numOfCards: Int, numOfCardsOnTable : Int, topCard: String): ErrorData {
-    var position = checkOutput(output.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
-    if ( position  == -1 ) return ErrorData(false, "Player turn: Wrong message for number of cards and top card.")
+fun checkPlayerOutput2(output: String, numOfCards: Int, numOfCardsOnTable : Int, topCard: String): ErrorData {
+    var position = if (numOfCardsOnTable == 0) checkOutput(output.lowercase(), 0, "No cards on the table".lowercase())
+    else checkOutput(output.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+    if ( position  == -1 ) return ErrorData(false, "Player turn: Wrong message for number of cards or the top card.")
+
     position = checkOutput(output.lowercase(), position, "Cards in hand:".lowercase())
     if ( position  == -1 ) return ErrorData(false, "Wrong cards in hand message.")
     val cardsInHand = output.substring(position).lines().map { it.trim() }.firstOrNull() { it != "" }
@@ -439,16 +655,33 @@ fun checkPlayerOutput(output: String, numOfCards: Int, numOfCardsOnTable : Int, 
     return ErrorData(true, "", cardsList = listCardsInHand)
 }
 
-fun checkComputerOutput(output: String, numOfCardsOnTable : Int, topCard: String): ErrorData {
-    var position = checkOutput(output.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
-    if ( position  == -1 ) return ErrorData(false, "Computer turn: Wrong output for number of cards and the top card.")
+fun checkComputerOutput2(output: String, numOfCardsOnTable : Int, topCard: String): ErrorData {
+    var position = if (numOfCardsOnTable == 0) checkOutput(output.lowercase(), 0, "No cards on the table".lowercase())
+    else checkOutput(output.lowercase(), 0, "$numOfCardsOnTable cards on the table, and the top card is $topCard".lowercase())
+    if ( position  == -1 ) return ErrorData(false, "Computer turn: Wrong output for number of cards or the top card.")
+
     position = checkOutput(output.lowercase(), position, "Computer plays".lowercase())
     if ( position  == -1 ) return ErrorData(false, "Wrong computer plays a card message.")
+
     val endIndex = output.indexOf("\n", position)
     if (endIndex < 0) return ErrorData(false, "Wrong output. Some lines are missing")
     val card = output.substring(position, endIndex).trim()
-    if (!checkOIfValidCards2(card, 1)) return ErrorData(false, "Wrong computer plays invalid card.")
+    if (!checkOIfValidCards2(card, 1)) return ErrorData(false, "Computer played an invalid card.")
     return ErrorData(true, "", card)
 }
 
+fun getRankSuit(card:String): Pair<String, String> {
+    return if (card.length == 2) Pair(card.substring(0, 1), card.substring(1, 2))
+    else Pair(card.substring(0, 2), card.substring(2, 3))
+}
 
+fun countPoints(cards: List<String>): Int {
+    val ranks = listOf("A", "10", "J", "Q", "K")
+    var count = 0
+    for (card in cards) {
+        val rank = if (card.length == 2) card.substring(0, 1)
+        else card.substring(0, 2)
+        if (rank in ranks) count++
+    }
+    return count
+}

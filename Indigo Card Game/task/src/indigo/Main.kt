@@ -1,184 +1,175 @@
 package indigo
 
-import kotlin.system.exitProcess
-
-private const val DECK_SIZE = 52
 private const val TABLE_SIZE = 4
 private const val HAND_SIZE = 6
 
-val ranks = listOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
-val suits = listOf("♦", "♥", "♠", "♣")
-var deck = ranks.cartesianProduct(suits)
-var table = mutableListOf<String>()
-var playerHand = mutableListOf<String>()
-var computerHand = mutableListOf<String>()
-
-enum class Starter {
-    PLAYER, COMPUTER
-}
-
 fun main() {
-    printTitle()
-    var onTurn = askWhoGoesFirst()
-    initGame()
-    while (deck.isNotEmpty() || playerHand.isNotEmpty() || computerHand.isNotEmpty()) {
-        if (Starter.PLAYER == onTurn) {
-            printTable()
-            printPlayerHand()
-            val cardToPlay = askForCardToPlay() ?: break
-            playPlayerCard(cardToPlay)
-        } else {
-            printTable()
-            playComputerCard()
-        }
-        onTurn = swapPlayer(onTurn)
-        dealCards()
-    }
-    if (deck.isEmpty()) {
-        printTable()
-    }
-    printGameOver()
+    Indigo().play()
 }
 
-private fun printTitle() {
-    println("Indigo Card Game")
-}
+class Indigo {
+    private val deck = Deck()
+    private val table = Table()
+    private val human = Human()
+    private val computer = Computer()
+    private lateinit var onTurn: Player
 
-private fun printGameOver() {
-    println("Game Over")
-}
-
-private fun askWhoGoesFirst(): Starter {
-    println("Play first?")
-    return when (readln()) {
-        "yes" -> Starter.PLAYER
-        "no" -> Starter.COMPUTER
-        else -> askWhoGoesFirst()
-    }
-}
-
-private fun initGame() {
-    shuffleDeck()
-    table = getCards(TABLE_SIZE)
-    playerHand = getCards(HAND_SIZE)
-    computerHand = getCards(HAND_SIZE)
-    println("Initial cards on the table: ${table.joinToString(" ")}")
-}
-
-private fun printTable() {
-    println("${table.size} cards on the table, and the top card is ${table.last()}")
-    println()
-}
-
-private fun printPlayerHand() {
-    var message = "Cards in hand: "
-    playerHand.forEachIndexed { index, card ->
-        message += "${index + 1})$card "
-    }
-    println(message.trimEnd())
-}
-
-private fun askForCardToPlay(): Int? {
-    println("Choose a card to play (1-${playerHand.size}):")
-    val input = readln()
-    if (input == "exit") {
-        return null
-    }
-    val number = input.toIntOrNull()
-    if (number == null || number !in 1..playerHand.size) {
-        return askForCardToPlay()
-    }
-    return number
-}
-
-private fun playPlayerCard(number: Int) {
-    val card = playerHand.removeAt(number - 1)
-    table.add(card)
-}
-
-private fun playComputerCard() {
-    // val card = computerHand.removeAt((0..5).random())
-    val card = computerHand.removeAt(0)
-    table.add(card)
-    println("Computer plays $card")
-}
-
-private fun swapPlayer(onTurn: Starter): Starter {
-    return if (onTurn == Starter.PLAYER) Starter.COMPUTER else Starter.PLAYER
-}
-
-private fun dealCards() {
-    if (playerHand.isEmpty()) {
-        playerHand = getCards(HAND_SIZE)
-    }
-    if (computerHand.isEmpty()) {
-        computerHand = getCards(HAND_SIZE)
-    }
-}
-
-private fun askForAction() {
-    println("Choose an action (reset, shuffle, get, exit):")
-    when (readln()) {
-        "reset" -> {
-            resetDeck()
-            println("Card deck is reset.")
-            askForAction()
-        }
-
-        "shuffle" -> {
-            shuffleDeck()
-            println("Card deck is shuffled.")
-            askForAction()
-        }
-
-        "get" -> {
-            println("Number of cards:")
-            val amount = readln().toIntOrNull()
-            if (amount == null || amount < 1 || amount > DECK_SIZE) {
-                println("Invalid number of cards.")
-                askForAction()
+    fun play() {
+        println("Indigo Card Game")
+        onTurn = askWhoGoesFirst()
+        init()
+        while (deck.isNotEmpty() || human.hand.isNotEmpty() || computer.hand.isNotEmpty()) {
+            if (onTurn is Human) {
+                table.showCards()
+                human.showHand()
+                val card = askForCardToPlay() ?: break
+                table.putCard(human.playCard(card))
+            } else {
+                table.showCards()
+                table.putCard(computer.playCard(0))
             }
-            if (amount!! > deck.size) {
-                println("The remaining cards are insufficient to meet the request.")
-                askForAction()
-            }
-            val cards = getCards(amount)
-            println(cards.joinToString(" "))
-            askForAction()
+            onTurn = nextTurn()
+            dealHand(human)
+            dealHand(computer)
         }
+        if (deck.isEmpty()) {
+            table.showCards()
+        }
+        println("Game Over")
+    }
 
-        "exit" -> {
-            println("Bye")
-            exitProcess(0)
+    private fun askWhoGoesFirst(): Player {
+        println("Play first?")
+        return when (readln()) {
+            "yes" -> human
+            "no" -> computer
+            else -> askWhoGoesFirst()
         }
+    }
 
-        else -> {
-            println("Wrong action.")
-            askForAction()
+    private fun init() {
+        human.getHand(deck.dealHand())
+        computer.getHand(deck.dealHand())
+        table.putCards(deck.dealTable())
+    }
+
+    private fun askForCardToPlay(): Int? {
+        val handSize = human.hand.size
+        println("Choose a card to play (1-$handSize):")
+        val input = readln()
+        if (input == "exit") {
+            return null
         }
+        val number = input.toIntOrNull()
+        if (number == null || number !in 1..handSize) {
+            return askForCardToPlay()
+        }
+        return number - 1
+    }
+
+    private fun dealHand(player: Player) {
+        if (player.hand.isEmpty()) {
+            player.getHand(deck.dealHand())
+        }
+    }
+
+    private fun nextTurn(): Player {
+        return if (onTurn is Human) computer else human
     }
 }
 
-private fun resetDeck() {
-    deck = ranks.cartesianProduct(suits)
-}
+class Deck {
+    private val ranks = listOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+    private val suits = listOf("♦", "♥", "♠", "♣")
+    private var cards = ranks.cartesianProduct(suits)
 
-private fun shuffleDeck() {
-    deck = deck.shuffled().toMutableList()
-}
+    init {
+        shuffle()
+    }
 
-private fun getCards(amount: Int): MutableList<String> {
-    val cards = mutableListOf<String>()
-    if (deck.isEmpty()) {
+    fun isEmpty(): Boolean {
+        return this.cards.isEmpty()
+    }
+
+    fun isNotEmpty(): Boolean {
+        return this.cards.isNotEmpty()
+    }
+
+    fun dealHand(): List<String> {
+        return deal(HAND_SIZE)
+    }
+
+    fun dealTable(): List<String> {
+        return deal(TABLE_SIZE)
+    }
+
+    private fun deal(amount: Int): List<String> {
+        val cards = mutableListOf<String>()
+        if (this.cards.isEmpty()) {
+            return cards
+        }
+        repeat(amount) {
+            cards.add(this.cards.removeAt(0))
+        }
         return cards
     }
-    repeat(amount) {
-        cards.add(deck.removeAt(0))
+
+    private fun shuffle() {
+        this.cards = this.cards.shuffled().toMutableList()
     }
-    return cards
 }
 
-private fun List<String>.cartesianProduct(second: List<String>): MutableList<String> {
+class Table {
+
+    private val cards = mutableListOf<String>()
+
+    fun showCards() {
+        println("${this.cards.size} cards on the table, and the top card is ${this.cards.last()}")
+        println()
+    }
+
+    fun putCards(cards: List<String>) {
+        this.cards.addAll(cards)
+        println("Initial cards on the table: ${this.cards.joinToString(" ")}")
+    }
+
+    fun putCard(card: String) {
+        this.cards.add(card)
+    }
+}
+
+open class Player {
+
+    var hand = mutableListOf<String>()
+
+    open fun getHand(cards: List<String>) {
+        this.hand = cards.toMutableList()
+    }
+
+    open fun showHand() {
+        var message = "Cards in hand: "
+        this.hand.forEachIndexed { index, card ->
+            message += "${index + 1})$card "
+        }
+        println(message.trimEnd())
+    }
+
+    open fun playCard(index: Int): String {
+        return this.hand.removeAt(index)
+    }
+}
+
+class Human : Player()
+
+class Computer : Player() {
+
+    override fun playCard(index: Int): String {
+        val card = super.playCard(index)
+        println("Computer plays $card")
+        return card
+    }
+}
+fun List<String>.cartesianProduct(second: List<String>): MutableList<String> {
     return this.flatMap { first ->
         second.map { second ->
             "$first$second"
