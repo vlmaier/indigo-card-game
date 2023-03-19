@@ -1,0 +1,18 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun <T> getStringsOnly(list: List<T>): List<String> {
+        val result = mutableListOf<String>()
+        // make your code here
+        return result
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/26463#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sun, 19 Mar 2023 19:06:14 UTC"
+record: -1
+submission_language: kotlin
