@@ -30,10 +30,11 @@ class Indigo {
                     playerExit = true
                     break
                 }
-                table.putCard(human.playCard(card), human)
+                table.putCard(human.playCard(card), onTurn)
             } else {
                 table.showCards()
-                table.putCard(computer.playCard(0), computer)
+                computer.showHand()
+                table.putCard(computer.playCard(ComputerAI(computer.hand, table.getCards()).getCardIndex()), onTurn)
             }
             onTurn = if (onTurn is Human) computer else human
             dealHand(human)
@@ -141,6 +142,10 @@ class Table {
     private lateinit var whoPlayedFirst: Player
     private lateinit var lastWinner: Player
 
+    fun getCards(): List<Card> {
+        return this.cards
+    }
+
     fun setWhoPlayedFirst(player: Player) {
         this.whoPlayedFirst = player
     }
@@ -241,10 +246,98 @@ class Human : Player()
 
 class Computer : Player() {
 
+    override fun showHand() {
+        var message = ""
+        this.hand.forEach { card ->
+            message += "$card "
+        }
+        println(message.trimEnd())
+    }
+
     override fun playCard(index: Int): Card {
         val card = super.playCard(index)
         println("Computer plays $card")
         return card
+    }
+}
+
+class ComputerAI(private val hand: List<Card>, private val table: List<Card>) {
+
+    fun getCardIndex(): Int {
+        val cardToPlay = getCard()
+        return hand.indexOf(cardToPlay)
+    }
+
+    private fun getCard(): Card {
+        if (hand.size == 1) {
+            return hand[0]
+        }
+        if (table.isEmpty()) {
+            return getOneOfTheSameSuitOrRank()
+        }
+        val candidates = getCandidateCards()
+        if (candidates.size == 1) {
+            return candidates[0]
+        }
+        if (candidates.isEmpty()) {
+            return getOneOfTheSameSuitOrRank()
+        }
+        val suitCandidates = getSuitCandidateCards()
+        if (suitCandidates.size >= 2) {
+            return suitCandidates.random()
+        }
+        val rankCandidates = getRankCandidateCards()
+        if (rankCandidates.size >= 2) {
+            return rankCandidates.random()
+        }
+        return candidates.random()
+    }
+
+    private fun getOneOfTheSameSuitOrRank(): Card {
+        val oneOfTheSameSuit = getOneOfTheSameSuit()
+        if (oneOfTheSameSuit != null) {
+            return oneOfTheSameSuit
+        }
+        val oneOfTheSameRank = getOneOfTheSameRank()
+        if (oneOfTheSameRank != null) {
+            return oneOfTheSameRank
+        }
+        return hand.random()
+    }
+
+    private fun getCandidateCards(): List<Card> {
+        val lastCard = table.last()
+        return hand.stream().filter { card -> card.suit == lastCard.suit || card.rank == lastCard.rank }.toList()
+    }
+
+    private fun getSuitCandidateCards(): List<Card> {
+        val lastCard = table.last()
+        return hand.stream().filter { card -> card.suit == lastCard.suit }.toList()
+    }
+
+    private fun getRankCandidateCards(): List<Card> {
+        val lastCard = table.last()
+        return hand.stream().filter { card -> card.rank == lastCard.rank }.toList()
+    }
+
+    private fun getOneOfTheSameSuit(): Card? {
+        val groupedBySuit = hand.groupBy { card -> card.suit }
+        for (entry in groupedBySuit) {
+            if (entry.value.size >= 2) {
+                return entry.value.random()
+            }
+        }
+        return null
+    }
+
+    private fun getOneOfTheSameRank(): Card? {
+        val groupedByRank = hand.groupBy { card -> card.rank }
+        for (entry in groupedByRank) {
+            if (entry.value.size >= 2) {
+                return entry.value.random()
+            }
+        }
+        return null
     }
 }
 
