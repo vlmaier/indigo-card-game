@@ -95,16 +95,16 @@ class Deck {
         return this.cards.isNotEmpty()
     }
 
-    fun dealHand(): List<String> {
+    fun dealHand(): List<Card> {
         return deal(HAND_SIZE)
     }
 
-    fun dealTable(): List<String> {
+    fun dealTable(): List<Card> {
         return deal(TABLE_SIZE)
     }
 
-    private fun deal(amount: Int): List<String> {
-        val cards = mutableListOf<String>()
+    private fun deal(amount: Int): List<Card> {
+        val cards = mutableListOf<Card>()
         if (this.cards.isEmpty()) {
             return cards
         }
@@ -119,30 +119,36 @@ class Deck {
     }
 }
 
+data class Card(val rank: String, val suit: String) {
+    override fun toString(): String {
+        return "$rank$suit"
+    }
+}
+
 class Table {
 
-    private val cards = mutableListOf<String>()
+    private val cards = mutableListOf<Card>()
 
     fun showCards() {
         println("${this.cards.size} cards on the table, and the top card is ${this.cards.last()}")
         println()
     }
 
-    fun putCards(cards: List<String>) {
+    fun putCards(cards: List<Card>) {
         this.cards.addAll(cards)
         println("Initial cards on the table: ${this.cards.joinToString(" ")}")
     }
 
-    fun putCard(card: String) {
+    fun putCard(card: Card) {
         this.cards.add(card)
     }
 }
 
 open class Player {
 
-    var hand = mutableListOf<String>()
+    var hand = mutableListOf<Card>()
 
-    open fun getHand(cards: List<String>) {
+    open fun getHand(cards: List<Card>) {
         this.hand = cards.toMutableList()
     }
 
@@ -154,7 +160,7 @@ open class Player {
         println(message.trimEnd())
     }
 
-    open fun playCard(index: Int): String {
+    open fun playCard(index: Int): Card {
         return this.hand.removeAt(index)
     }
 }
@@ -163,16 +169,16 @@ class Human : Player()
 
 class Computer : Player() {
 
-    override fun playCard(index: Int): String {
+    override fun playCard(index: Int): Card {
         val card = super.playCard(index)
         println("Computer plays $card")
         return card
     }
 }
-fun List<String>.cartesianProduct(second: List<String>): MutableList<String> {
+fun List<String>.cartesianProduct(second: List<String>): MutableList<Card> {
     return this.flatMap { first ->
         second.map { second ->
-            "$first$second"
+            Card(first, second)
         }
     }.toMutableList()
 }

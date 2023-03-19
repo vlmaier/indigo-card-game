@@ -700,21 +700,6 @@ files:
         return count
     }
   learner_created: false
-- name: src/indigo/Deck.kt
-  visible: true
-  learner_created: true
-- name: src/indigo/Extensions.kt
-  visible: true
-  learner_created: true
-- name: src/indigo/Player.kt
-  visible: true
-  learner_created: true
-- name: src/indigo/Table.kt
-  visible: true
-  learner_created: true
-- name: src/indigo/Indigo.kt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16511#comment
 status: Failed
 feedback:
