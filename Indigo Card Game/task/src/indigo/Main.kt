@@ -2,6 +2,7 @@ package indigo
 
 private const val TABLE_SIZE = 4
 private const val HAND_SIZE = 6
+private const val MOST_CARDS_SCORE = 3
 
 fun main() {
     Indigo().play()
@@ -12,28 +13,36 @@ class Indigo {
     private val table = Table()
     private val human = Human()
     private val computer = Computer()
-    private lateinit var onTurn: Player
 
     fun play() {
         println("Indigo Card Game")
-        onTurn = askWhoGoesFirst()
+        val whoGoesFirst = askWhoGoesFirst()
+        table.setWhoPlayedFirst(whoGoesFirst)
+        var onTurn = whoGoesFirst
         init()
+        var playerExit = false
         while (deck.isNotEmpty() || human.hand.isNotEmpty() || computer.hand.isNotEmpty()) {
             if (onTurn is Human) {
                 table.showCards()
                 human.showHand()
-                val card = askForCardToPlay() ?: break
-                table.putCard(human.playCard(card))
+                val card = askForCardToPlay()
+                if (card == null) {
+                    playerExit = true
+                    break
+                }
+                table.putCard(human.playCard(card), human)
             } else {
                 table.showCards()
-                table.putCard(computer.playCard(0))
+                table.putCard(computer.playCard(0), computer)
             }
-            onTurn = nextTurn()
+            onTurn = if (onTurn is Human) computer else human
             dealHand(human)
             dealHand(computer)
         }
-        if (deck.isEmpty()) {
+        if (!playerExit) {
             table.showCards()
+            table.addLeftCards()
+            table.showScoreBoard(isFinal = true)
         }
         println("Game Over")
     }
@@ -71,10 +80,6 @@ class Indigo {
         if (player.hand.isEmpty()) {
             player.getHand(deck.dealHand())
         }
-    }
-
-    private fun nextTurn(): Player {
-        return if (onTurn is Human) computer else human
     }
 }
 
@@ -123,15 +128,30 @@ data class Card(val rank: String, val suit: String) {
     override fun toString(): String {
         return "$rank$suit"
     }
+
+    fun matchesRankOrSuit(card: Card): Boolean {
+        return this.rank == card.rank || this.suit == card.suit
+    }
 }
 
 class Table {
+    private var cards = mutableListOf<Card>()
+    private val humanCardsWon = mutableListOf<Card>()
+    private val computerCardsWon = mutableListOf<Card>()
+    private lateinit var whoPlayedFirst: Player
+    private lateinit var lastWinner: Player
 
-    private val cards = mutableListOf<Card>()
+    fun setWhoPlayedFirst(player: Player) {
+        this.whoPlayedFirst = player
+    }
 
     fun showCards() {
-        println("${this.cards.size} cards on the table, and the top card is ${this.cards.last()}")
         println()
+        if (this.cards.isEmpty()) {
+            println("No cards on the table")
+        } else {
+            println("${this.cards.size} cards on the table, and the top card is ${this.cards.last()}")
+        }
     }
 
     fun putCards(cards: List<Card>) {
@@ -139,8 +159,60 @@ class Table {
         println("Initial cards on the table: ${this.cards.joinToString(" ")}")
     }
 
-    fun putCard(card: Card) {
+    fun putCard(card: Card, player: Player) {
+        val lastCardOnTable = this.cards.lastOrNull()
         this.cards.add(card)
+        if (lastCardOnTable != null && lastCardOnTable.matchesRankOrSuit(card)) {
+            lastWinner = player
+            addWonCardsToPlayer(this.cards, player)
+            this.cards = mutableListOf()
+            showScoreBoard()
+        }
+    }
+
+    fun showScoreBoard(isFinal: Boolean = false) {
+        var humanScore = calculateScore(humanCardsWon)
+        var computerScore = calculateScore(computerCardsWon)
+        if (isFinal) {
+            if (humanCardsWon.size == computerCardsWon.size) {
+                if (whoPlayedFirst is Human) {
+                    humanScore += MOST_CARDS_SCORE
+                } else {
+                    computerScore += MOST_CARDS_SCORE
+                }
+            } else {
+                humanScore += if (humanCardsWon.size > computerCardsWon.size) MOST_CARDS_SCORE else 0
+                computerScore += if (computerCardsWon.size > humanCardsWon.size) MOST_CARDS_SCORE else 0
+            }
+        }
+        println("Score: Player $humanScore - Computer $computerScore")
+        println("Cards: Player ${humanCardsWon.size} - Computer ${computerCardsWon.size}")
+    }
+
+    private fun calculateScore(cards: List<Card>): Int {
+        val ranksWithPoints = arrayOf("A", "K", "Q", "J", "10")
+        return cards.stream().filter { card -> card.rank in ranksWithPoints }.count().toInt()
+    }
+
+    fun addLeftCards() {
+        if (humanCardsWon.isEmpty() && computerCardsWon.isEmpty()) {
+            addWonCardsToPlayer(this.cards, whoPlayedFirst, print = false)
+        } else {
+            addWonCardsToPlayer(this.cards, lastWinner, print = false)
+        }
+        this.cards = mutableListOf()
+    }
+
+    private fun addWonCardsToPlayer(cards: List<Card>, player: Player, print: Boolean = true) {
+        val isHumanPlayer = player is Human
+        if (isHumanPlayer) {
+            humanCardsWon.addAll(cards)
+        } else {
+            computerCardsWon.addAll(cards)
+        }
+        if (print) {
+            println("${if (isHumanPlayer) "Player" else "Computer"} wins cards")
+        }
     }
 }
 
@@ -175,6 +247,7 @@ class Computer : Player() {
         return card
     }
 }
+
 fun List<String>.cartesianProduct(second: List<String>): MutableList<Card> {
     return this.flatMap { first ->
         second.map { second ->
