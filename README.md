@@ -1,3 +1,5 @@
+![](https://github.com/vlmaier/indigo-card-game/actions/workflows/build.yml/badge.svg)
+
 # Indigo Card Game
 
 Repository for learning Kotlin w/ JetBrains Academy [Indigo Card Game](https://hyperskill.org/projects/214) Project.
