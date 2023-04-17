@@ -1,4 +1,5 @@
 <h2>Danger level</h2>
+<div class="step-text">
 <html><body><p>Given an enumeration named <code class="language-kotlin">DangerLevel</code>.</p>
 <p>Add an integer property to store the danger level and ascribe the number to each constant:</p>
 <table border="1" cellpadding="1" cellspacing="1" style="width: 200px;">
@@ -24,6 +25,7 @@ val medium = DangerLevel.MEDIUM
 
 println(high.getLevel() &gt; medium.getLevel()) // true</code></pre>
 <p> </p><div class="alert alert-warning">You can't name the property <code class="language-kotlin">level</code>, because in this case the hidden <code class="language-kotlin">getLevel()</code> function (returns the value of the <code class="language-kotlin">level</code> property) automatically created. So, choose another name for the property.</div><p></p></body></html><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
+</div>
 <b>Caution</b><br><br>
 You may see errors in your code or execution results due to missing context. Don’t worry about it, just write the solution and press Check.
 <br><br>

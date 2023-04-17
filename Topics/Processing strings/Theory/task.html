@@ -1,4 +1,5 @@
 <h2>Processing strings</h2>
+<div class="step-text">
 <p>In some sense, a string looks like a list of characters. You can <strong>iterate </strong>both over strings and lists. However, sometimes you need to turn a string into a list.</p><h5 id="splitting-the-string">Splitting the string</h5><p>A string can be separated by delimiters to a list of strings. To perform this, call the method <code class="language-kotlin">split()</code> , it divides a string into substrings by a <strong>separator</strong>.  In the previous example, we used the <code class="language-kotlin">" "</code> delimiter, which splits a string into separate words by spaces. Notably, the delimiter itself is not included in any of the substrings.</p><p>The method returns a <code class="language-kotlin">List</code> of all the substrings. The <code class="language-kotlin">List</code> is similar to <code class="language-kotlin">MutableList</code>, but you <strong>cannot reassign </strong>elements in the <code class="language-kotlin">List</code> and you cannot resize the <code class="language-kotlin">List</code>. You can easily convert <code class="language-kotlin">List</code> to <code class="language-kotlin">MutableList</code> and vice versa with <code class="language-kotlin">toMutableList()</code> and <code class="language-kotlin">toList()</code> functions.</p><pre><code class="language-kotlin">val sentence = "a long text"
 val wordsList: List&lt;String&gt; = sentence.split(" ") // ["a", "long", "text"]
 
@@ -30,3 +31,4 @@ for (index in rainbow.indices){
 5: C
 6: B
 7: V</code></pre><h5 id="conclusion">Conclusion</h5><p>In this section, we have discussed simple ways to handle strings. It may sound simple, but this knowledge can help you solve even non-trivial problems. Good luck with your tasks!</p>
+</div>

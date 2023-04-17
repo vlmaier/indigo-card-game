@@ -1,4 +1,5 @@
 <h2>Jumps and returns</h2>
+<div class="step-text">
 <p>Have you ever had a situation when you wanted to have more control over loop iterations and wished you could jump out of a loop manually? For example, when a special condition occurs or when you need to process only certain cases and skip others? Fortunately, Kotlin has a special tool for it: <strong>structural jump expressions</strong>. There are three structural jump expressions in Kotlin: <code class="language-kotlin">break</code>, <code class="language-kotlin">continue</code>, and <code class="language-kotlin">return</code>. What makes them even more flexible is <strong>labels</strong>. Let's take a look at these features now.</p>
 <h5 id="the-break-statement">The Break Statement</h5>
 <p>A <code class="language-kotlin">break</code> expression is used to terminate the nearest enclosing loop. You can literally <strong>break </strong>the loop with your own condition. In the example below, we used it in the if-else case:</p>
@@ -151,3 +152,4 @@ i = 1, j = 3</code></pre>
 <p>All the considered statements can also be used with the <code class="language-kotlin">while</code> loop.</p>
 <p>The <code class="language-kotlin">return</code> statement immediately returns the result of the function, and the code after the <code class="language-kotlin">return</code> keyword will not be executed.</p>
 <p>Remember, it's hard to read and fix code with a lot of structural jump expressions. Be very careful and do not overuse them!</p>
+</div>

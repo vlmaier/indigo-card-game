@@ -1,4 +1,5 @@
 <h2>toString()</h2>
+<div class="step-text">
 <p>Sometimes we need to submit information as a string, for example, to a console for debugging. How can we represent non-text objects as a string so we can output them in a readable way? This is where we use the <code class="language-kotlin">toString()</code> function.</p><h5 id="introduction">Introduction</h5><p>Let’s say we have three boxes each filled with a different kind of berry: raspberry, strawberry, and blueberry. We need information about the weight of each of these boxes. Let’s print it:</p><pre><code class="language-kotlin">val raspberryWeight = 10
 val strawberryWeight = 15
 val blueberryWeight = 20
@@ -84,3 +85,4 @@ println(author2)
     2."The Death of Ivan Ilyich" 
     3."War and Peace"
 */</code></pre><p>As you can see, we used the definition of the <code class="language-kotlin">toString()</code> function for the parent class <code class="language-kotlin">User</code>, adding it to the class <code class="language-kotlin">Author</code>. The result was an override of <code class="language-kotlin">toString()</code> for the class <code class="language-kotlin">Author</code> using the override for <code class="language-kotlin">User</code>.</p><h5 id="summary">Summary</h5><p>The <code class="language-kotlin">toString()</code> function is used to create a string view of non-string objects. It comes in handy in various situations, for example, in debugging. In this topic, we saw how it works and learned to override it for the class we are using. In order to override <code class="language-kotlin">toString()</code> for the child classes, all standard rules of inheritance should apply. Now you're ready to solve various complex tasks using <code class="language-kotlin">toString()</code>!</p>
+</div>

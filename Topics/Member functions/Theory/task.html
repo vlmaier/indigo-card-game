@@ -1,4 +1,5 @@
 <h2>Member functions</h2>
+<div class="step-text">
 <h5 id="writing-member-functions">Writing member functions</h5><p>Sometimes you need to store in objects not only the data itself but also a behavior. <strong>Member functions</strong> implement a common behavior for the whole set of objects which belong to the same class.</p><p>Member functions look like functions placed in the class body. In the example below, we declare a class with one function <code class="language-kotlin">print()</code>:</p><pre><code class="language-kotlin">class MyClass {
     fun print() = println("Hello from print")
 }</code></pre><p>This function is called a <strong>member</strong> function because it works with a specific object of a class and can access its fields. It's a class member:</p><pre><code class="language-kotlin">class MyClassWithProperty(var property: Int) {
@@ -48,3 +49,4 @@ meow
 zzz
 zzz
 meow</code></pre><p>So, member functions allow programmers to manipulate particular objects of a class and perform some operations. As always, functions unite a sequence of operations under a name that makes sense.</p>
+</div>
