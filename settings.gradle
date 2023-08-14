@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.github.hyperskill:hs-gradle-plugin:1.2"
+        classpath "com.github.hyperskill:hs-gradle-plugin:1.3"
     }
 
     configurations.all {
